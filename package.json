@@ -1,0 +1,21 @@
+{
+  "name": "@algo-trading/trading-utils",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "types": "types/types.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "AlgoTrading",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.4"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.1"
+  }
+}
