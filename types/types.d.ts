@@ -1,7 +1,7 @@
 export = TradingUtils;
 
 declare namespace TradingUtils {
-  export namespace Position {
+  export namespace Positions {
     export type Side = 'long' | 'short'
 
     export type Position = {
@@ -21,15 +21,15 @@ declare namespace TradingUtils {
     }
   }
 
-  export class Position {
+  export class Positions {
     constructor(API_SECRET: string, positionsUrl: string, signalProviderId: string, futures: boolean)
   
-    opened: (market: string) => Position.OpenedPosition | undefined
+    opened: (market: string) => Positions.OpenedPosition | undefined
 
     init(): void
   
-    enter(side: Position.Side, market: string, entryPrice: number): Position.Position | undefined
+    enter(side: Positions.Side, market: string, entryPrice: number): Promise<Positions.Position> | undefined
         
-    close(market: string, closePrice: number): Position.Position | undefined
+    close(market: string, closePrice: number): Promise<Positions.Position> | undefined
   }
 }

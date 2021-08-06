@@ -1,6 +1,6 @@
 {
   "name": "@algo-trading/trading-utils",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "",
   "main": "index.js",
   "types": "types/types.d.ts",
