@@ -77,7 +77,7 @@ class Positions {
   }
 
   async close(market, closePrice) {
-    const positionId = this._opened[market]
+    const positionId = this._opened[market]._id
 
     const params = new URLSearchParams({
       signalProviderId: this.signalProviderId,
