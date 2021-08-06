@@ -14,7 +14,7 @@ const fetchData = async (url, {
   })
   const data = await res.json()
 
-  if (!res.ok) {
+  if (!res.ok || !data.success) {
     throw data
   }
 

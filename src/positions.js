@@ -9,7 +9,7 @@ const getOpenedPositions = (positions) => {
   return opened
 }
 
-class Position {
+class Positions {
   constructor(API_SECRET, positionsUrl, signalProviderId, futures = false) {
     this.positionsUrl = `${positionsUrl}/api/v1/positions`
     this.signalProviderId = signalProviderId
@@ -17,7 +17,11 @@ class Position {
 
     this.futures = futures
 
-    this.positionId = {}
+    this._opened = {}
+  }
+
+  get opened() {
+    return (market) => this._opened[market]
   }
 
   async init() {
@@ -32,8 +36,11 @@ class Position {
 
     const opened = getOpenedPositions(_data)
 
-    opened.forEach(({ _id, market }) => {
-      this.positionId[market] = _id
+    opened.forEach(({ _id, market, side }) => {
+      this._opened[market] = {
+        _id,
+        side,
+      }
     })
   }
 
@@ -59,15 +66,18 @@ class Position {
     })
 
     if (position?.data?._id) {
-      this.positionId[market] = position.data._id
-      return position
+      this._opened[market] = {
+        _id: position.data._id,
+        side: position.data.side,
+      }
+      return position.data
     }
 
     return undefined
   }
 
   async close(market, closePrice) {
-    const positionId = this.positionId[market]
+    const positionId = this._opened[market]
 
     const params = new URLSearchParams({
       signalProviderId: this.signalProviderId,
@@ -89,8 +99,8 @@ class Position {
     })
 
     if (position?.data?._id) {
-      this.positionId[market] = undefined
-      return position
+      this._opened[market]._id = undefined
+      return position.data
     }
 
     return undefined
@@ -107,4 +117,4 @@ class Position {
   }
 }
 
-module.exports = Position
+module.exports = Positions

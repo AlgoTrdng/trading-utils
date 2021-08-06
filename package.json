@@ -1,6 +1,6 @@
 {
   "name": "@algo-trading/trading-utils",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "index.js",
   "types": "types/types.d.ts",
@@ -16,6 +16,7 @@
     "eslint-plugin-import": "^2.23.4"
   },
   "dependencies": {
+    "binance-api-nodejs": "^0.0.15",
     "node-fetch": "^2.6.1"
   }
 }

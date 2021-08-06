@@ -1,5 +1,5 @@
-const Position = require('./src/position')
+const Positions = require('./src/positions')
 
 module.exports = {
-  Position,
+  Positions,
 }
