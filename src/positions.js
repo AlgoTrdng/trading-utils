@@ -36,11 +36,8 @@ class Positions {
 
     const opened = getOpenedPositions(_data)
 
-    opened.forEach(({ _id, market, side }) => {
-      this._opened[market] = {
-        _id,
-        side,
-      }
+    opened.forEach((position) => {
+      this._opened[position.market] = position
     })
   }
 
@@ -66,10 +63,7 @@ class Positions {
     })
 
     if (position?.data?._id) {
-      this._opened[market] = {
-        _id: position.data._id,
-        side: position.data.side,
-      }
+      this._opened[market] = position.data
       return position.data
     }
 
@@ -77,7 +71,13 @@ class Positions {
   }
 
   async close(market, closePrice) {
-    const positionId = this._opened[market]._id
+    const openedPosition = this._opened[market]
+
+    if (!openedPosition) {
+      return undefined
+    }
+
+    const { _id: positionId } = openedPosition
 
     const params = new URLSearchParams({
       signalProviderId: this.signalProviderId,
@@ -99,7 +99,7 @@ class Positions {
     })
 
     if (position?.data?._id) {
-      this._opened[market]._id = undefined
+      this._opened[market] = undefined
       return position.data
     }
 

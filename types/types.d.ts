@@ -14,19 +14,14 @@ declare namespace TradingUtils {
       closeTime?: Date;
       pnl?: number;
     }
-
-    export type OpenedPosition = {
-      _id?: string;
-      side: Side;
-    }
   }
 
   export class Positions {
     constructor(API_SECRET: string, positionsUrl: string, signalProviderId: string, futures: boolean)
   
-    opened: (market: string) => Positions.OpenedPosition | undefined
+    opened: (market: string) => Positions.Position | undefined
 
-    init(): void
+    init(): Promise<void>
   
     enter(side: Positions.Side, market: string, entryPrice: number): Promise<Positions.Position> | undefined
         
