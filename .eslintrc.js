@@ -13,5 +13,6 @@ module.exports = {
   rules: {
     semi: ['error', 'never'],
     'no-underscore-dangle': 0,
+    'max-len': ['error', { code: 150 }],
   },
 }
