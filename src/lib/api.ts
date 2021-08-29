@@ -1,13 +1,15 @@
-const fetch = require('node-fetch')
+import fetch from 'node-fetch'
 
-/**
- * @param {string} url
- * @param {{ body: string; method: 'POST' | 'GET', signature: string, ts: string }} fetchParams
- * @returns
- */
-const fetchData = async (url, {
+type fetchParams = {
+  body: string
+  method: 'POST' | 'GET'
+  signature: string
+  ts: string
+}
+
+const fetchData = async (url: string, {
   body, method, signature, ts,
-}) => {
+}: fetchParams) => {
   const res = await fetch(url, {
     method,
     body,
@@ -26,4 +28,4 @@ const fetchData = async (url, {
   return data
 }
 
-module.exports = fetchData
+export default fetchData

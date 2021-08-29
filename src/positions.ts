@@ -1,24 +1,53 @@
-const fetch = require('node-fetch')
-const { createHmac } = require('crypto')
+import fetch from 'node-fetch'
+import { createHmac } from 'crypto'
 
-const fetchData = require('./lib/api')
-const sendSignal = require('./lib/send-signal')
+import fetchData from './lib/api'
+import sendSignal from './lib/send-signal'
+import { SignalProviders } from './types/types'
 
-const getOpenedPositions = (positions) => {
+type Position = {
+  _id: string
+  side: 'long' | 'short'
+  market: string
+  entryPrice: number
+  entryTime: Date
+  state: 'open' | 'closed'
+  closePrice?: number
+  closeTime?: Date
+  pnl?: number
+}
+
+const getOpenedPositions = (positions: Position[]) => {
   const opened = positions.filter(({ state }) => state === 'open')
 
   return opened
 }
 
+type secrets = {
+  SIGNALS_SECRET: string
+  API_SECRET: string
+}
+
+type OpenedPositions = {
+  [market: string]: Position | undefined
+}
+
 class Positions {
-  /**
-   * @param {{ SIGNALS_SECRET: string; API_SECRET: string }} secrets
-   * @param {string} positionsUrl
-   * @param {string} strategy
-   * @param {string[]} signalProviders
-   * @param {boolean} futures
-   */
-  constructor({ SIGNALS_SECRET, API_SECRET }, positionsUrl, strategy, signalProviders, futures = false) {
+  API_SECRET: string
+
+  SIGNALS_SECRET: string
+
+  positionsUrl: string
+
+  strategy: string
+
+  signalProviders: SignalProviders
+
+  futures: boolean
+
+  _opened: OpenedPositions = {}
+
+  constructor({ SIGNALS_SECRET, API_SECRET }: secrets, positionsUrl: string, strategy: string, signalProviders: SignalProviders, futures = false) {
     this.API_SECRET = API_SECRET
     this.SIGNALS_SECRET = SIGNALS_SECRET
     this.positionsUrl = `${positionsUrl}/api/v1/positions`
@@ -26,12 +55,10 @@ class Positions {
     this.strategy = strategy
     this.signalProviders = signalProviders
     this.futures = futures
-
-    this._opened = {}
   }
 
   get opened() {
-    return (market) => this._opened[market]
+    return (market: string): Position | undefined => this._opened[market]
   }
 
   async init() {
@@ -51,13 +78,7 @@ class Positions {
     })
   }
 
-  /**
-   * @param {'long' | 'short'} side
-   * @param {string} baseAsset
-   * @param {string} quoteAsset
-   * @param {number} entryPrice
-   */
-  async enter(side, baseAsset, quoteAsset, entryPrice) {
+  async enter(side: 'long' | 'short', baseAsset: string, quoteAsset: string, entryPrice: number) {
     const market = `${baseAsset}${quoteAsset}`
 
     const body = JSON.stringify({
@@ -98,12 +119,7 @@ class Positions {
     return undefined
   }
 
-  /**
-   * @param {string} baseAsset
-   * @param {string} quoteAsset
-   * @param {number} closePrice
-   */
-  async close(baseAsset, quoteAsset, closePrice) {
+  async close(baseAsset: string, quoteAsset: string, closePrice: number) {
     const market = `${baseAsset}${quoteAsset}`
     const openedPosition = this._opened[market]
 
@@ -148,13 +164,8 @@ class Positions {
     return undefined
   }
 
-  /**
-   * @param {string} key
-   * @param {any} data
-   * @returns {{ signature: string; ts: string }}
-   */
   // eslint-disable-next-line class-methods-use-this
-  createSignature(key) {
+  createSignature(key: string) {
     const ts = `${new Date().getTime()}`
     const signature = createHmac('sha256', key).update(ts).digest('hex')
 
@@ -165,4 +176,4 @@ class Positions {
   }
 }
 
-module.exports = Positions
+export default Positions
