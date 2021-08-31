@@ -45,7 +45,7 @@ class Positions {
 
   futures: boolean
 
-  _opened: OpenedPositions = {}
+  private _opened: OpenedPositions = {}
 
   constructor({ SIGNALS_SECRET, API_SECRET }: secrets, positionsUrl: string, strategy: string, signalProviders: SignalProviders, futures = false) {
     this.API_SECRET = API_SECRET

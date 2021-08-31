@@ -1,6 +1,9 @@
 import Binance, { StreamNames } from 'binance-api-nodejs'
 
-type CandlestickData = {
+/**
+ * Candlestick data passed as payload
+ */
+export type CandlestickData = {
   o: number
   h: number
   l: number
@@ -11,7 +14,10 @@ type CandlestickData = {
   closeTime: number
 }
 
-type CallbackPayload<S> = {
+/**
+ * onTick, onNewCandle payload
+ */
+export type CallbackPayload<S> = {
   state: S
   market: string
   timeframe: string
@@ -19,23 +25,41 @@ type CallbackPayload<S> = {
   prevCandlestickData: CandlestickData
 }
 
+/**
+ * onTick, onNewCandle callback
+ */
 // eslint-disable-next-line no-unused-vars
-type UpdateCallback<S> = (payload: CallbackPayload<S>) => void
+export type UpdateCallback<S> = (payload: CallbackPayload<S>) => void
+
+/**
+ * onInit callback payload
+ */
+export type OnInitPayload<S> = {
+  state: S
+  market: string
+  timeframe: string
+}
+
+/**
+ * onInit callback
+ */
+// eslint-disable-next-line no-unused-vars
+export type OnInitCallback<S> = (payload: OnInitPayload<S>) => void
 
 /**
  * Bot callbacks
  */
-type Callbacks<S> = {
-  // eslint-disable-next-line no-unused-vars
+export type Callbacks<S> = {
   onTick?: UpdateCallback<S>
-  // eslint-disable-next-line no-unused-vars
   onNewCandle?: UpdateCallback<S>
+  // eslint-disable-next-line no-unused-vars
+  onInit?: OnInitCallback<S>
 }
 
 /**
  * Previous candlestick data for each stream
  */
-type MarketsData = {
+export type MarketsData = {
   [stream: string]: CandlestickData
 }
 
@@ -46,18 +70,18 @@ export type States<S> = {
   [market: string]: S
 }
 
-class Bot<S> {
+class Bot<S extends {}> {
   watchedMarkets: StreamNames[]
 
   binance: Binance
 
-  callbacks: Callbacks<S> = {}
+  private callbacks: Callbacks<S> = {}
 
-  candlesticksData: MarketsData = {}
+  private candlesticksData: MarketsData = {}
 
-  states: States<S>
+  private states: States<S>
 
-  defaultState: S
+  private defaultState: S
 
   constructor(watchedMarkets: StreamNames[], state: S) {
     this.defaultState = state
@@ -74,12 +98,33 @@ class Bot<S> {
   /**
    * Subscribe to markets
    */
-  watchMarkets(callbacks?: Callbacks<S>) {
+  async watchMarkets(callbacks?: Callbacks<S>) {
     if (callbacks) {
-      const { onTick, onNewCandle } = callbacks
+      const { onTick, onNewCandle, onInit } = callbacks
 
-      this.callbacks.onTick = onTick
-      this.callbacks.onNewCandle = onNewCandle
+      if (typeof onInit === 'function') {
+        this.callbacks.onInit = onInit
+      }
+
+      if (typeof onTick === 'function') {
+        this.callbacks.onTick = onTick
+      }
+
+      if (typeof onNewCandle === 'function') {
+        this.callbacks.onNewCandle = onNewCandle
+      }
+    }
+
+    if (typeof this.callbacks.onInit === 'function') {
+      const { onInit } = this.callbacks
+
+      for (let i = 0; i < this.watchedMarkets.length; i += 1) {
+        const [market, timeframe] = this.watchedMarkets[i]
+        const state = this.states[market]
+
+        // eslint-disable-next-line no-await-in-loop
+        await onInit({ market, timeframe, state })
+      }
     }
 
     this.binance.spotWebsockets.candlesticks(this.watchedMarkets, ({ stream, data }) => {
@@ -125,6 +170,10 @@ class Bot<S> {
 
       this.candlesticksData[stream] = currentCandlestickData
     })
+  }
+
+  onInit(onInitCb: OnInitCallback<S>) {
+    this.callbacks.onInit = onInitCb
   }
 
   onTick(onTickCb: UpdateCallback<S>) {

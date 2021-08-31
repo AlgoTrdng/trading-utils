@@ -1,5 +1,8 @@
 import Binance, { StreamNames } from 'binance-api-nodejs';
-declare type CandlestickData = {
+/**
+ * Candlestick data passed as payload
+ */
+export declare type CandlestickData = {
     o: number;
     h: number;
     l: number;
@@ -9,25 +12,44 @@ declare type CandlestickData = {
     openTime: number;
     closeTime: number;
 };
-declare type CallbackPayload<S> = {
+/**
+ * onTick, onNewCandle payload
+ */
+export declare type CallbackPayload<S> = {
     state: S;
     market: string;
     timeframe: string;
     currentCandlestickData: CandlestickData;
     prevCandlestickData: CandlestickData;
 };
-declare type UpdateCallback<S> = (payload: CallbackPayload<S>) => void;
+/**
+ * onTick, onNewCandle callback
+ */
+export declare type UpdateCallback<S> = (payload: CallbackPayload<S>) => void;
+/**
+ * onInit callback payload
+ */
+export declare type OnInitPayload<S> = {
+    state: S;
+    market: string;
+    timeframe: string;
+};
+/**
+ * onInit callback
+ */
+export declare type OnInitCallback<S> = (payload: OnInitPayload<S>) => void;
 /**
  * Bot callbacks
  */
-declare type Callbacks<S> = {
+export declare type Callbacks<S> = {
     onTick?: UpdateCallback<S>;
     onNewCandle?: UpdateCallback<S>;
+    onInit?: OnInitCallback<S>;
 };
 /**
  * Previous candlestick data for each stream
  */
-declare type MarketsData = {
+export declare type MarketsData = {
     [stream: string]: CandlestickData;
 };
 /**
@@ -36,18 +58,19 @@ declare type MarketsData = {
 export declare type States<S> = {
     [market: string]: S;
 };
-declare class Bot<S> {
+declare class Bot<S extends {}> {
     watchedMarkets: StreamNames[];
     binance: Binance;
-    callbacks: Callbacks<S>;
-    candlesticksData: MarketsData;
-    states: States<S>;
-    defaultState: S;
+    private callbacks;
+    private candlesticksData;
+    private states;
+    private defaultState;
     constructor(watchedMarkets: StreamNames[], state: S);
     /**
      * Subscribe to markets
      */
-    watchMarkets(callbacks?: Callbacks<S>): void;
+    watchMarkets(callbacks?: Callbacks<S>): Promise<void>;
+    onInit(onInitCb: OnInitCallback<S>): void;
     onTick(onTickCb: UpdateCallback<S>): void;
     onNewCandle(onNewcandleCb: UpdateCallback<S>): void;
 }

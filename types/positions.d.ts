@@ -14,9 +14,6 @@ declare type secrets = {
     SIGNALS_SECRET: string;
     API_SECRET: string;
 };
-declare type OpenedPositions = {
-    [market: string]: Position | undefined;
-};
 declare class Positions {
     API_SECRET: string;
     SIGNALS_SECRET: string;
@@ -24,7 +21,7 @@ declare class Positions {
     strategy: string;
     signalProviders: SignalProviders;
     futures: boolean;
-    _opened: OpenedPositions;
+    private _opened;
     constructor({ SIGNALS_SECRET, API_SECRET }: secrets, positionsUrl: string, strategy: string, signalProviders: SignalProviders, futures?: boolean);
     get opened(): (market: string) => Position | undefined;
     init(): Promise<void>;

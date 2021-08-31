@@ -1,11 +1,11 @@
 {
   "name": "@algo-trading/trading-utils",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "",
   "main": "dist/index.js",
   "types": "types",
   "scripts": {
-    "build": "tsc --declaration --declarationDir ./types",
+    "build": "rm -rf types && tsc --declaration --declarationDir ./types",
     "build-watch": "tsc --watch"
   },
   "keywords": [],
