@@ -37,7 +37,6 @@ export type UpdateCallback<S> = (payload: CallbackPayload<S>) => void
 export type OnInitPayload<S> = {
   state: S
   market: string
-  timeframe: string
 }
 
 /**
@@ -117,13 +116,14 @@ class Bot<S extends {}> {
 
     if (typeof this.callbacks.onInit === 'function') {
       const { onInit } = this.callbacks
+      const markets = Object.keys(this.states)
 
-      for (let i = 0; i < this.watchedMarkets.length; i += 1) {
-        const [market, timeframe] = this.watchedMarkets[i]
+      for (let i = 0; i < markets.length; i += 1) {
+        const market = markets[i]
         const state = this.states[market]
 
         // eslint-disable-next-line no-await-in-loop
-        await onInit({ market, timeframe, state })
+        await onInit({ market, state })
       }
     }
 
