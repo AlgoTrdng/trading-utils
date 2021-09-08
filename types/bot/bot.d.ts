@@ -32,7 +32,6 @@ export declare type UpdateCallback<S> = (payload: CallbackPayload<S>) => void;
 export declare type OnInitPayload<S> = {
     state: S;
     market: string;
-    timeframe: string;
 };
 /**
  * onInit callback

@@ -7,7 +7,7 @@ export declare type SignalParams = {
     positionId: string;
     futures: boolean;
 };
-declare const sendSignal: (type: 'open' | 'close', params: SignalParams, { signature, ts }: {
+declare const sendSignal: (url: string, type: 'open' | 'close', params: SignalParams, { signature, ts }: {
     signature: string;
     ts: string;
 }) => Promise<void>;

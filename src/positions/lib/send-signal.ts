@@ -1,7 +1,5 @@
 import fetch from './api'
 
-const SIGNALS_API_URL = 'https://algo-trading-signals.vercel.app'
-
 export type SignalParams = {
   signalProviders: ['zignaly'?, 'compendium'?]
   strategy: string
@@ -12,10 +10,10 @@ export type SignalParams = {
   futures: boolean
 }
 
-const sendSignal = async (type: 'open' | 'close', params: SignalParams, { signature, ts }: { signature: string; ts: string }) => {
-  const url = `${SIGNALS_API_URL}/api/v1/signal-${type}`
-
-  await fetch(url, {
+const sendSignal = async (
+  url: string, type: 'open' | 'close', params: SignalParams, { signature, ts }: { signature: string; ts: string },
+) => {
+  await fetch(`${url}/signal/${type}`, {
     method: 'POST',
     body: JSON.stringify(params),
     signature,
