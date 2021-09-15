@@ -12,7 +12,7 @@ declare type Position = {
 };
 declare type ConfigParams = {
     API_SECRET: string;
-    STRATEGY: 'trend-signals';
+    STRATEGY: 'trend-signals' | 'trend-signals-v1';
     ENV: 'production' | 'backtest' | 'test';
     SIGNAL_PROVIDERS: SignalProviders;
     FUTURES: boolean;
