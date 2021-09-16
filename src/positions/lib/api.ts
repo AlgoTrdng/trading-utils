@@ -15,7 +15,7 @@ const fetchData = async (url: string, {
     body,
     headers: {
       'Content-Type': 'application/json',
-      'x-algotrading-api-secret': signature,
+      'x-algotrading-signature': signature,
       'x-algotrading-timestamp': ts,
     },
   })
