@@ -1,7 +1,6 @@
 import fetch from 'node-fetch'
-import { createHmac } from 'crypto'
 
-import fetchData from './lib/api'
+import fetchData, { createSignature } from './lib/api'
 import sendSignal from './lib/send-signal'
 import { SignalProviders } from '../types/types'
 
@@ -28,11 +27,6 @@ type ConfigParams = {
   SIGNAL_PROVIDERS: SignalProviders
   FUTURES: boolean
   developmentUrl?: string
-}
-
-type AuthCredentials = {
-  ts: string
-  signature: string
 }
 
 type SendSignalParams = {
@@ -103,7 +97,9 @@ class Positions {
       entryPrice,
     })
 
-    const { signature, ts } = this.createSignature()
+    const { signature, ts } = createSignature(this.config.API_SECRET)
+
+    console.log(signature, this.config, this.config.API_SECRET)
 
     const API_URL = `${this.API_URL}/positions/open`
     const position = await fetchData(API_URL, {
@@ -141,7 +137,7 @@ class Positions {
       positionId,
     }
 
-    await sendSignal(this.API_URL, 'open', body, this.createSignature())
+    await sendSignal(this.API_URL, 'open', body, createSignature(this.config.API_SECRET))
   }
 
   async enterPositionAndSendSignal(side: 'long' | 'short', baseAsset: string, quoteAsset: string, entryPrice: number) {
@@ -177,7 +173,7 @@ class Positions {
     })
 
     const API_URL = `${this.API_URL}/positions/close`
-    const closedPosition = await fetchData(API_URL, { body, method: 'POST', ...this.createSignature() })
+    const closedPosition = await fetchData(API_URL, { body, method: 'POST', ...createSignature(this.config.API_SECRET) })
 
     if (closedPosition?.data?._id) {
       this.openedPositions[market] = undefined
@@ -204,7 +200,7 @@ class Positions {
       positionId,
     }
 
-    await sendSignal(this.API_URL, 'close', body, this.createSignature())
+    await sendSignal(this.API_URL, 'close', body, createSignature(this.config.API_SECRET))
   }
 
   async exitPositionAndSendSignal(baseAsset: string, quoteAsset: string, closePrice: number) {
@@ -224,18 +220,6 @@ class Positions {
     })
 
     return closedPosition
-  }
-
-  createSignature(): AuthCredentials {
-    const key = this.config.API_SECRET
-
-    const ts = `${new Date().getTime()}`
-    const signature = createHmac('sha256', key).update(ts).digest('hex')
-
-    return {
-      signature,
-      ts,
-    }
   }
 }
 

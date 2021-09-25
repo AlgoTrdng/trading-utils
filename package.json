@@ -1,7 +1,6 @@
 {
   "name": "@algo-trading/trading-utils",
-  "version": "0.4.0",
-  "description": "",
+  "version": "0.5.0",
   "main": "dist/index.js",
   "types": "types",
   "scripts": {
@@ -24,5 +23,14 @@
   "dependencies": {
     "binance-api-nodejs": "^0.0.15",
     "node-fetch": "^2.6.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlgoTrdng/trading-utils.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AlgoTrdng/trading-utils/issues"
+  },
+  "homepage": "https://github.com/AlgoTrdng/trading-utils#readme",
+  "description": ""
 }

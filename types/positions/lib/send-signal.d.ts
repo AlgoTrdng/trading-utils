@@ -1,5 +1,6 @@
+import { SignalProviders } from '../../types/types';
 export declare type SignalParams = {
-    signalProviders: ['zignaly'?, 'compendium'?];
+    signalProviders: SignalProviders;
     strategy: string;
     baseAsset: string;
     quoteAsset: string;

@@ -1,7 +1,8 @@
+import { SignalProviders } from '../../types/types'
 import fetch from './api'
 
 export type SignalParams = {
-  signalProviders: ['zignaly'?, 'compendium'?]
+  signalProviders: SignalProviders
   strategy: string
   baseAsset: string
   quoteAsset: string

@@ -1,1 +1,1 @@
-export declare type SignalProviders = ['zignaly'?, 'compendium'?];
+export declare type SignalProviders = ('zignaly' | 'compendium')[];

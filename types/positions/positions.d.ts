@@ -18,10 +18,6 @@ declare type ConfigParams = {
     FUTURES: boolean;
     developmentUrl?: string;
 };
-declare type AuthCredentials = {
-    ts: string;
-    signature: string;
-};
 declare type SendSignalParams = {
     side: 'long' | 'short';
     baseAsset: string;
@@ -41,6 +37,5 @@ declare class Positions {
     exitPosition(baseAsset: string, quoteAsset: string, closePrice: number): Promise<Position | undefined>;
     sendExitSignal(params: SendSignalParams): Promise<void>;
     exitPositionAndSendSignal(baseAsset: string, quoteAsset: string, closePrice: number): Promise<Position | undefined>;
-    createSignature(): AuthCredentials;
 }
 export default Positions;

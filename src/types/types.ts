@@ -1,1 +1,1 @@
-export type SignalProviders = ['zignaly'?, 'compendium'?]
+export type SignalProviders = ('zignaly' | 'compendium')[]
