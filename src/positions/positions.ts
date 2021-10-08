@@ -1,8 +1,9 @@
 import fetch from 'node-fetch'
 
-import fetchData, { createSignature } from './lib/api'
+import fetchData, { createSignature } from '../utils/api'
 import sendSignal from './lib/send-signal'
-import { SignalProviders } from '../types/types'
+import { ENVTypes, SignalProviders, Strategy } from '../types/types'
+import { createApiUrls } from '../constants'
 
 type Position = {
   _id: string
@@ -22,8 +23,8 @@ type OpenedPositions = {
 
 type ConfigParams = {
   API_SECRET: string
-  STRATEGY: 'trend-signals' | 'trend-signals-v1'
-  ENV: 'production' | 'backtest' | 'test'
+  STRATEGY: Strategy
+  ENV: ENVTypes
   SIGNAL_PROVIDERS: SignalProviders
   FUTURES: boolean
   developmentUrl?: string
@@ -52,12 +53,7 @@ class Positions {
   constructor(config: ConfigParams) {
     this.config = config
 
-    const ENV_API_URL = {
-      production: 'https://algo-trading-api.herokuapp.com/api/v1',
-      backtest: 'https://algo-trading-api-backtest.herokuapp.com/api/v1',
-      test: config.developmentUrl || 'http://localhost:5050/api/v1',
-    }
-
+    const ENV_API_URL = createApiUrls(config.developmentUrl)
     this.API_URL = ENV_API_URL[config.ENV]
   }
 

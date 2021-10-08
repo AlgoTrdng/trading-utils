@@ -1,5 +1,5 @@
 import { SignalProviders } from '../../types/types'
-import fetch from './api'
+import fetch from '../../utils/api'
 
 export type SignalParams = {
   signalProviders: SignalProviders

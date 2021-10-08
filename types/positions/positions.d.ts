@@ -1,4 +1,4 @@
-import { SignalProviders } from '../types/types';
+import { ENVTypes, SignalProviders, Strategy } from '../types/types';
 declare type Position = {
     _id: string;
     side: 'long' | 'short';
@@ -12,8 +12,8 @@ declare type Position = {
 };
 declare type ConfigParams = {
     API_SECRET: string;
-    STRATEGY: 'trend-signals' | 'trend-signals-v1';
-    ENV: 'production' | 'backtest' | 'test';
+    STRATEGY: Strategy;
+    ENV: ENVTypes;
     SIGNAL_PROVIDERS: SignalProviders;
     FUTURES: boolean;
     developmentUrl?: string;
