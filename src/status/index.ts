@@ -38,8 +38,11 @@ class StatusManager {
     this.sendUpdates()
   }
 
-  private sendUpdates() {
+  private async sendUpdates() {
     this.updateLocally(3)
+
+    await this.sendUpdate()
+
     setInterval(async () => {
       await this.sendUpdate()
     }, UPDATE_PERIOD)
@@ -51,7 +54,7 @@ class StatusManager {
     }
 
     const credentials = createSignature(this.API_SECRET)
-    await fetchData(this.apiUrl, {
+    await fetchData(`${this.apiUrl}/status`, {
       ...credentials,
       method: 'POST',
       body: JSON.stringify({
