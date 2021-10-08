@@ -12,14 +12,22 @@ export type SignalParams = {
 }
 
 const sendSignal = async (
-  url: string, type: 'open' | 'close', params: SignalParams, { signature, ts }: { signature: string; ts: string },
+  url: string,
+  type: 'open' | 'close',
+  params: SignalParams,
+  { signature, ts }: { signature: string; ts: string },
+  onError?: () => void,
 ) => {
-  await fetch(`${url}/signal/${type}`, {
+  const data = await fetch(`${url}/signal/${type}`, {
     method: 'POST',
     body: JSON.stringify(params),
     signature,
     ts,
   })
+
+  if (!data.success && onError) {
+    onError()
+  }
 }
 
 export default sendSignal

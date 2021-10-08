@@ -21,6 +21,12 @@ type OpenedPositions = {
   [market: string]: Position | undefined
 }
 
+type Callbacks = {
+  onEnterPositionError?: () => void
+  onClosePositionError?: () => void
+  onSendSignalError?: () => void
+}
+
 type ConfigParams = {
   API_SECRET: string
   STRATEGY: Strategy
@@ -28,6 +34,7 @@ type ConfigParams = {
   SIGNAL_PROVIDERS: SignalProviders
   FUTURES: boolean
   developmentUrl?: string
+  callbacks?: Callbacks
 }
 
 type SendSignalParams = {
@@ -50,8 +57,12 @@ class Positions {
 
   private openedPositions: OpenedPositions = {}
 
+  private callbacks: Callbacks
+
   constructor(config: ConfigParams) {
     this.config = config
+
+    this.callbacks = config.callbacks || {}
 
     const ENV_API_URL = createApiUrls(config.developmentUrl)
     this.API_URL = ENV_API_URL[config.ENV]
@@ -95,8 +106,6 @@ class Positions {
 
     const { signature, ts } = createSignature(this.config.API_SECRET)
 
-    console.log(signature, this.config, this.config.API_SECRET)
-
     const API_URL = `${this.API_URL}/positions/open`
     const position = await fetchData(API_URL, {
       method: 'POST',
@@ -110,6 +119,10 @@ class Positions {
 
       this.openedPositions[_market] = position.data
       return position.data as Position
+    }
+
+    if (this.callbacks.onEnterPositionError) {
+      this.callbacks.onEnterPositionError()
     }
 
     console.log('Error entering position')
@@ -133,7 +146,7 @@ class Positions {
       positionId,
     }
 
-    await sendSignal(this.API_URL, 'open', body, createSignature(this.config.API_SECRET))
+    await sendSignal(this.API_URL, 'open', body, createSignature(this.config.API_SECRET), this.callbacks.onSendSignalError)
   }
 
   async enterPositionAndSendSignal(side: 'long' | 'short', baseAsset: string, quoteAsset: string, entryPrice: number) {
@@ -176,6 +189,10 @@ class Positions {
       return closedPosition.data as Position
     }
 
+    if (this.callbacks.onClosePositionError) {
+      this.callbacks.onClosePositionError()
+    }
+
     console.log('Error closing position')
     return undefined
   }
@@ -196,7 +213,7 @@ class Positions {
       positionId,
     }
 
-    await sendSignal(this.API_URL, 'close', body, createSignature(this.config.API_SECRET))
+    await sendSignal(this.API_URL, 'close', body, createSignature(this.config.API_SECRET), this.callbacks.onSendSignalError)
   }
 
   async exitPositionAndSendSignal(baseAsset: string, quoteAsset: string, closePrice: number) {
@@ -216,6 +233,18 @@ class Positions {
     })
 
     return closedPosition
+  }
+
+  onEnterPositionError(callback: () => void) {
+    this.callbacks.onEnterPositionError = callback
+  }
+
+  onClosePositionError(callback: () => void) {
+    this.callbacks.onClosePositionError = callback
+  }
+
+  onSendSignalError(callback: () => void) {
+    this.callbacks.onSendSignalError = callback
   }
 }
 

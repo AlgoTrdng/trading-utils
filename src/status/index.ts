@@ -24,6 +24,8 @@ class StatusManager {
 
   lastUpdated = new Date().getTime()
 
+  started = false
+
   constructor({
     strategy, developmentUrl, ENV, API_SECRET,
   }: StatusManagerParams) {
@@ -37,6 +39,12 @@ class StatusManager {
   }
 
   sendUpdates() {
+    if (this.started) {
+      return
+    }
+
+    this.updateLocally(3)
+    this.started = true
     setInterval(async () => {
       await this.sendUpdate()
     }, UPDATE_PERIOD)
@@ -59,7 +67,12 @@ class StatusManager {
   }
 
   updateLocally(status: Status) {
+    if (this.status === 1 || this.status === 2) {
+      return
+    }
+
     this.status = status
+    this.lastUpdated = new Date().getTime()
   }
 }
 
