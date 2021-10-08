@@ -54,12 +54,11 @@ class StatusManager {
     }
 
     const credentials = createSignature(this.API_SECRET)
-    await fetchData(`${this.apiUrl}/status`, {
+    await fetchData(`${this.apiUrl}/status/${this.strategy}`, {
       ...credentials,
       method: 'POST',
       body: JSON.stringify({
         status: this.status,
-        strategy: this.strategy,
       }),
     })
   }
