@@ -12,8 +12,9 @@ declare class StatusManager {
     API_SECRET: string;
     status: Status;
     lastUpdated: number;
+    started: boolean;
     constructor({ strategy, developmentUrl, ENV, API_SECRET, }: StatusManagerParams);
-    sendUpdates(): void;
+    private sendUpdates;
     private sendUpdate;
     updateLocally(status: Status): void;
 }

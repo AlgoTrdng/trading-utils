@@ -11,5 +11,5 @@ export declare type SignalParams = {
 declare const sendSignal: (url: string, type: 'open' | 'close', params: SignalParams, { signature, ts }: {
     signature: string;
     ts: string;
-}) => Promise<void>;
+}, onError?: (() => void) | undefined) => Promise<void>;
 export default sendSignal;

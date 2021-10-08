@@ -10,6 +10,11 @@ declare type Position = {
     closeTime?: Date;
     pnl?: number;
 };
+declare type Callbacks = {
+    onEnterPositionError?: () => void;
+    onClosePositionError?: () => void;
+    onSendSignalError?: () => void;
+};
 declare type ConfigParams = {
     API_SECRET: string;
     STRATEGY: Strategy;
@@ -17,6 +22,7 @@ declare type ConfigParams = {
     SIGNAL_PROVIDERS: SignalProviders;
     FUTURES: boolean;
     developmentUrl?: string;
+    callbacks?: Callbacks;
 };
 declare type SendSignalParams = {
     side: 'long' | 'short';
@@ -28,6 +34,7 @@ declare class Positions {
     config: ConfigParams;
     API_URL: string;
     private openedPositions;
+    private callbacks;
     constructor(config: ConfigParams);
     get opened(): (market?: string | undefined) => Position | (Position | undefined)[] | undefined;
     init(): Promise<void>;
@@ -37,5 +44,8 @@ declare class Positions {
     exitPosition(baseAsset: string, quoteAsset: string, closePrice: number): Promise<Position | undefined>;
     sendExitSignal(params: SendSignalParams): Promise<void>;
     exitPositionAndSendSignal(baseAsset: string, quoteAsset: string, closePrice: number): Promise<Position | undefined>;
+    onEnterPositionError(callback: () => void): void;
+    onClosePositionError(callback: () => void): void;
+    onSendSignalError(callback: () => void): void;
 }
 export default Positions;

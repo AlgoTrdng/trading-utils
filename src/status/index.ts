@@ -38,13 +38,8 @@ class StatusManager {
     this.sendUpdates()
   }
 
-  sendUpdates() {
-    if (this.started) {
-      return
-    }
-
+  private sendUpdates() {
     this.updateLocally(3)
-    this.started = true
     setInterval(async () => {
       await this.sendUpdate()
     }, UPDATE_PERIOD)
