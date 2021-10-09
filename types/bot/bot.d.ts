@@ -29,21 +29,26 @@ export declare type UpdateCallback<S> = (payload: CallbackPayload<S>) => void;
 /**
  * onInit callback payload
  */
-export declare type OnInitPayload<S> = {
+export declare type OnMarketInitPayload<S> = {
     state: S;
     market: string;
 };
 /**
+ * onMarketInit callback
+ */
+export declare type OnMarketInitCallback<S> = (payload: OnMarketInitPayload<S>) => void;
+/**
  * onInit callback
  */
-export declare type OnInitCallback<S> = (payload: OnInitPayload<S>) => void;
+export declare type OnInitCallback = () => void;
 /**
  * Bot callbacks
  */
 export declare type Callbacks<S> = {
     onTick?: UpdateCallback<S>;
     onNewCandle?: UpdateCallback<S>;
-    onInit?: OnInitCallback<S>;
+    onMarketInit?: OnMarketInitCallback<S>;
+    onInit?: OnInitCallback;
 };
 /**
  * Previous candlestick data for each stream
@@ -69,8 +74,9 @@ declare class Bot<S extends {}> {
      * Subscribe to markets
      */
     watchMarkets(callbacks?: Callbacks<S>): Promise<void>;
-    onInit(onInitCb: OnInitCallback<S>): void;
+    onMarketInit(onMarketInitCb: OnMarketInitCallback<S>): void;
     onTick(onTickCb: UpdateCallback<S>): void;
     onNewCandle(onNewcandleCb: UpdateCallback<S>): void;
+    onInit(onInitCb: OnInitCallback): void;
 }
 export default Bot;

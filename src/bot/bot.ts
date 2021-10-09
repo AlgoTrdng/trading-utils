@@ -34,16 +34,21 @@ export type UpdateCallback<S> = (payload: CallbackPayload<S>) => void
 /**
  * onInit callback payload
  */
-export type OnInitPayload<S> = {
+export type OnMarketInitPayload<S> = {
   state: S
   market: string
 }
 
 /**
- * onInit callback
+ * onMarketInit callback
  */
 // eslint-disable-next-line no-unused-vars
-export type OnInitCallback<S> = (payload: OnInitPayload<S>) => void
+export type OnMarketInitCallback<S> = (payload: OnMarketInitPayload<S>) => void
+
+/**
+ * onInit callback
+ */
+export type OnInitCallback = () => void
 
 /**
  * Bot callbacks
@@ -52,7 +57,8 @@ export type Callbacks<S> = {
   onTick?: UpdateCallback<S>
   onNewCandle?: UpdateCallback<S>
   // eslint-disable-next-line no-unused-vars
-  onInit?: OnInitCallback<S>
+  onMarketInit?: OnMarketInitCallback<S>
+  onInit?: OnInitCallback
 }
 
 /**
@@ -99,10 +105,12 @@ class Bot<S extends {}> {
    */
   async watchMarkets(callbacks?: Callbacks<S>) {
     if (callbacks) {
-      const { onTick, onNewCandle, onInit } = callbacks
+      const {
+        onTick, onNewCandle, onMarketInit, onInit,
+      } = callbacks
 
-      if (typeof onInit === 'function') {
-        this.callbacks.onInit = onInit
+      if (typeof onMarketInit === 'function') {
+        this.callbacks.onMarketInit = onMarketInit
       }
 
       if (typeof onTick === 'function') {
@@ -112,10 +120,18 @@ class Bot<S extends {}> {
       if (typeof onNewCandle === 'function') {
         this.callbacks.onNewCandle = onNewCandle
       }
+
+      if (typeof onInit === 'function') {
+        this.callbacks.onInit = onInit
+      }
     }
 
     if (typeof this.callbacks.onInit === 'function') {
-      const { onInit } = this.callbacks
+      await this.callbacks.onInit()
+    }
+
+    if (typeof this.callbacks.onMarketInit === 'function') {
+      const { onMarketInit } = this.callbacks
       const markets = Object.keys(this.states)
 
       for (let i = 0; i < markets.length; i += 1) {
@@ -123,7 +139,7 @@ class Bot<S extends {}> {
         const state = this.states[market]
 
         // eslint-disable-next-line no-await-in-loop
-        await onInit({ market, state })
+        await onMarketInit({ market, state })
       }
     }
 
@@ -172,8 +188,8 @@ class Bot<S extends {}> {
     })
   }
 
-  onInit(onInitCb: OnInitCallback<S>) {
-    this.callbacks.onInit = onInitCb
+  onMarketInit(onMarketInitCb: OnMarketInitCallback<S>) {
+    this.callbacks.onMarketInit = onMarketInitCb
   }
 
   onTick(onTickCb: UpdateCallback<S>) {
@@ -182,6 +198,10 @@ class Bot<S extends {}> {
 
   onNewCandle(onNewcandleCb: UpdateCallback<S>) {
     this.callbacks.onNewCandle = onNewcandleCb
+  }
+
+  onInit(onInitCb: OnInitCallback) {
+    this.callbacks.onInit = onInitCb
   }
 }
 
