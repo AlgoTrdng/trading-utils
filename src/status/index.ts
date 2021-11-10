@@ -7,9 +7,11 @@ export type StatusManagerParams = {
   developmentUrl?: string
   ENV: ENVTypes
   API_SECRET: string
+  updatePeriod?: number
 }
 
-const UPDATE_PERIOD = 1000 * 60 * 30
+// DEFAULT 2 hours
+const UPDATE_PERIOD = 1000 * 60 * 60 * 2
 
 export type Status = 0 | 1 | 2 | 3
 
@@ -26,11 +28,17 @@ class StatusManager {
 
   started = false
 
+  UPDATE_PERIOD = UPDATE_PERIOD
+
   constructor({
-    strategy, developmentUrl, ENV, API_SECRET,
+    strategy, developmentUrl, ENV, API_SECRET, updatePeriod,
   }: StatusManagerParams) {
     this.strategy = strategy
     this.API_SECRET = API_SECRET
+
+    if (updatePeriod) {
+      this.UPDATE_PERIOD = updatePeriod
+    }
 
     const API_URLS = createApiUrls(developmentUrl)
     this.apiUrl = API_URLS[ENV]
@@ -45,11 +53,11 @@ class StatusManager {
 
     setInterval(async () => {
       await this.sendUpdate()
-    }, UPDATE_PERIOD)
+    }, this.UPDATE_PERIOD)
   }
 
   private async sendUpdate() {
-    if (this.lastUpdated + UPDATE_PERIOD < new Date().getTime()) {
+    if (this.lastUpdated + this.UPDATE_PERIOD < new Date().getTime()) {
       this.status = 1
     }
 
