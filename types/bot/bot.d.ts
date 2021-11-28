@@ -1,4 +1,4 @@
-import Binance, { StreamNames } from 'binance-api-nodejs';
+import Binance, { CandlesticksResponse, StreamNames } from 'binance-api-nodejs';
 /**
  * Candlestick data passed as payload
  */
@@ -74,6 +74,9 @@ declare class Bot<S extends {}> {
      * Subscribe to markets
      */
     watchMarkets(callbacks?: Callbacks<S>): Promise<void>;
+    backtest(candlesticks: {
+        [market: string]: CandlesticksResponse[];
+    }): void;
     onMarketInit(onMarketInitCb: OnMarketInitCallback<S>): void;
     onTick(onTickCb: UpdateCallback<S>): void;
     onNewCandle(onNewcandleCb: UpdateCallback<S>): void;

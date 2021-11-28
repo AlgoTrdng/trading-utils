@@ -1,4 +1,4 @@
-import Binance, { StreamNames } from 'binance-api-nodejs'
+import Binance, { CandlesticksResponse, StreamNames } from 'binance-api-nodejs'
 
 /**
  * Candlestick data passed as payload
@@ -186,6 +186,54 @@ class Bot<S extends {}> {
 
       this.candlesticksData[stream] = currentCandlestickData
     })
+  }
+
+  backtest(candlesticks: { [market: string]: CandlesticksResponse[] }) {
+    const markets = Object.keys(candlesticks)
+
+    for (let i = 0; i < markets.length; i += 1) {
+      const market = markets[i]
+      const marketCandlesticks = candlesticks[market]
+      let prevCandlestick: CandlestickData | null = null
+
+      const _state = this.states[market]
+      if (this.callbacks.onMarketInit) {
+        this.callbacks.onMarketInit({ state: _state, market })
+      }
+
+      for (let j = 0; j < marketCandlesticks.length; j += 1) {
+        const {
+          o, h, l, c, openTime, closeTime,
+        } = marketCandlesticks[j]
+        const state = this.states[market] || this.defaultState
+
+        if (prevCandlestick && this.callbacks.onNewCandle) {
+          const payload: CallbackPayload<S> = {
+            state,
+            market,
+            timeframe: '',
+            currentCandlestickData: {
+              o,
+              h,
+              l,
+              c,
+              openTime,
+              closeTime,
+              baseVolume: 0,
+              quoteVolume: 0,
+            },
+            prevCandlestickData: prevCandlestick,
+          }
+          this.callbacks.onNewCandle(payload)
+        }
+
+        prevCandlestick = {
+          ...marketCandlesticks[j],
+          baseVolume: 0,
+          quoteVolume: 0,
+        }
+      }
+    }
   }
 
   onMarketInit(onMarketInitCb: OnMarketInitCallback<S>) {
