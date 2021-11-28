@@ -188,7 +188,7 @@ class Bot<S extends {}> {
     })
   }
 
-  backtest(candlesticks: { [market: string]: CandlesticksResponse[] }) {
+  async backtest(candlesticks: { [market: string]: CandlesticksResponse[] }) {
     const markets = Object.keys(candlesticks)
 
     for (let i = 0; i < markets.length; i += 1) {
@@ -198,7 +198,8 @@ class Bot<S extends {}> {
 
       const _state = this.states[market]
       if (this.callbacks.onMarketInit) {
-        this.callbacks.onMarketInit({ state: _state, market })
+        // eslint-disable-next-line no-await-in-loop
+        await this.callbacks.onMarketInit({ state: _state, market })
       }
 
       for (let j = 0; j < marketCandlesticks.length; j += 1) {
@@ -224,7 +225,8 @@ class Bot<S extends {}> {
             },
             prevCandlestickData: prevCandlestick,
           }
-          this.callbacks.onNewCandle(payload)
+          // eslint-disable-next-line no-await-in-loop
+          await this.callbacks.onNewCandle(payload)
         }
 
         prevCandlestick = {

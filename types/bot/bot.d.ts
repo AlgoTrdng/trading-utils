@@ -76,7 +76,7 @@ declare class Bot<S extends {}> {
     watchMarkets(callbacks?: Callbacks<S>): Promise<void>;
     backtest(candlesticks: {
         [market: string]: CandlesticksResponse[];
-    }): void;
+    }): Promise<void>;
     onMarketInit(onMarketInitCb: OnMarketInitCallback<S>): void;
     onTick(onTickCb: UpdateCallback<S>): void;
     onNewCandle(onNewcandleCb: UpdateCallback<S>): void;
